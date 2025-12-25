@@ -14,6 +14,11 @@ import (
 func BearerAuth(cfg *config.Config) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			// 如果未配置Token，则跳过验证（允许匿名访问）
+			if cfg.Security.BearerToken == "" {
+				return next(c)
+			}
+
 			// 获取Authorization header
 			auth := c.Request().Header.Get("Authorization")
 
