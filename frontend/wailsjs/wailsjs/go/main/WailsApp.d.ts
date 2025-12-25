@@ -10,6 +10,8 @@ export function GetLogFilePath():Promise<string>;
 
 export function GetLogFileSize():Promise<string>;
 
+export function GetMonicaCookie():Promise<string>;
+
 export function GetQuota():Promise<main.QuotaInfo>;
 
 export function GetServiceStatus():Promise<main.ServiceStatus>;

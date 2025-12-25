@@ -18,6 +18,10 @@ export function GetLogFileSize() {
   return window['go']['main']['WailsApp']['GetLogFileSize']();
 }
 
+export function GetMonicaCookie() {
+  return window['go']['main']['WailsApp']['GetMonicaCookie']();
+}
+
 export function GetQuota() {
   return window['go']['main']['WailsApp']['GetQuota']();
 }

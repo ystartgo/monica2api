@@ -140,12 +140,25 @@
         
         <el-form :model="form" label-width="120px" size="large" class="form-large">
         <el-form-item :label="$t('config.cookie')" required>
-          <el-input
-            v-model="form.monica.cookie"
-            type="textarea"
-            :rows="4"
-            :placeholder="$t('config.cookieHolder')"
-          />
+          <div class="cookie-input-wrapper">
+            <el-input
+              v-model="form.monica.cookie"
+              type="textarea"
+              :rows="4"
+              :placeholder="$t('config.cookieHolder')"
+            />
+            <el-button 
+              type="primary" 
+              plain 
+              size="small" 
+              class="auto-cookie-btn"
+              @click="autoGetCookie" 
+              :loading="cookieLoading"
+            >
+              <el-icon><MagicStick /></el-icon>
+              {{ $t('config.autoGetCookie') }}
+            </el-button>
+          </div>
         </el-form-item>
         
         <el-form-item :label="$t('config.botUid')">
@@ -291,8 +304,8 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
-import { VideoPlay, VideoPause, Connection, Coin, Check, Link, CopyDocument } from '@element-plus/icons-vue'
-import {GetConfig,UpdateConfig,StartService,StopService,TestConfig,GetServiceStatus,GetQuota} from '../../wailsjs/wailsjs/go/main/WailsApp.js'
+import { VideoPlay, VideoPause, Connection, Coin, Check, Link, CopyDocument, MagicStick } from '@element-plus/icons-vue'
+import {GetConfig,UpdateConfig,StartService,StopService,TestConfig,GetServiceStatus,GetQuota,GetMonicaCookie} from '../../wailsjs/wailsjs/go/main/WailsApp.js'
 const appStore = useAppStore()
 const { t } = useI18n()
 
@@ -318,6 +331,7 @@ const form = reactive({
 })
 
 const loading = ref(false)
+const cookieLoading = ref(false)
 const showTestResults = ref(false)
 const testResults = ref([])
 const quotaInfo = ref({})
@@ -540,9 +554,42 @@ function maskApiKey(key) {
   if (key.length <= 8) return '********'
   return key.substring(0, 3) + '****' + key.substring(key.length - 4)
 }
+
+async function autoGetCookie() {
+  cookieLoading.value = true
+  try {
+    const cookie = await GetMonicaCookie()
+    if (cookie) {
+      form.monica.cookie = cookie
+      ElMessage.success(t('config.autoGetSuccess'))
+    }
+  } catch (error) {
+    const errorMsg = error?.message || error?.toString() || '未知错误'
+    ElMessage.error(t('config.autoGetFail') + ': ' + errorMsg)
+  } finally {
+    cookieLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
+.cookie-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.auto-cookie-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.auto-cookie-btn:hover {
+  opacity: 1;
+}
+
 /* ... (unchanged) */
 /* 页面布局增强 */
 .page-layout {
