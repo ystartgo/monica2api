@@ -4,17 +4,33 @@
       <el-header class="app-header">
         <div class="app-header-content">
           <h1 class="app-title">Monica Proxy Wails</h1>
-          <p class="app-subtitle">基于界面的Monica（Web）转换成 API 的工具</p>
+          <p class="app-subtitle">{{ $t('app.subtitle') }}</p>
         </div>
-        <div class="app-status">
-          <el-tag v-if="appStore.isServiceRunning" class="status-tag running" effect="dark">
-            <el-icon><VideoPlay /></el-icon>
-            服务运行中
-          </el-tag>
-          <el-tag v-else class="status-tag stopped" effect="dark">
-            <el-icon><VideoPause /></el-icon>
-            服务未启动
-          </el-tag>
+        <div class="header-controls" style="display: flex; align-items: center; gap: 10px;">
+          <el-dropdown @command="handleLangCommand">
+            <span class="el-dropdown-link" style="color: white; cursor: pointer; display: flex; align-items: center;">
+              Language
+              <el-icon class="el-icon--right"><arrow-down /></el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="zh-CN">简体中文</el-dropdown-item>
+                <el-dropdown-item command="zh-TW">繁體中文</el-dropdown-item>
+                <el-dropdown-item command="en">English</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          
+          <div class="app-status">
+            <el-tag v-if="appStore.isServiceRunning" class="status-tag running" effect="dark">
+              <el-icon><VideoPlay /></el-icon>
+              {{ $t('app.status.running') }}
+            </el-tag>
+            <el-tag v-else class="status-tag stopped" effect="dark">
+              <el-icon><VideoPause /></el-icon>
+              {{ $t('app.status.serviceStopped') }}
+            </el-tag>
+          </div>
         </div>
       </el-header>
       
@@ -27,19 +43,19 @@
           >
             <el-menu-item index="/main">
               <el-icon><Setting /></el-icon>
-              <span>主要配置</span>
+              <span>{{ $t('app.menu.mainConfig') }}</span>
             </el-menu-item>
             <el-menu-item index="/server">
               <el-icon><Cpu /></el-icon>
-              <span>服务器配置</span>
+              <span>{{ $t('app.menu.serverConfig') }}</span>
             </el-menu-item>
             <el-menu-item index="/logging">
               <el-icon><Document /></el-icon>
-              <span>日志配置</span>
+              <span>{{ $t('app.menu.loggingConfig') }}</span>
             </el-menu-item>
             <el-menu-item index="/copyright">
               <el-icon><InfoFilled /></el-icon>
-              <span>版权信息</span>
+              <span>{{ $t('app.menu.copyright') }}</span>
             </el-menu-item>
           </el-menu>
         </el-aside>
@@ -57,9 +73,15 @@
 <script setup>
 import { useAppStore } from '@/stores/app'
 import { onMounted } from 'vue'
-import { Setting, Cpu, Document, InfoFilled, VideoPlay, VideoPause } from '@element-plus/icons-vue'
+import { useI18n } from 'vue-i18n'
+import { Setting, Cpu, Document, InfoFilled, VideoPlay, VideoPause, ArrowDown } from '@element-plus/icons-vue'
 import {GetServiceStatus,GetConfig} from '../wailsjs/wailsjs/go/main/WailsApp.js'
 const appStore = useAppStore()
+const { locale, t } = useI18n()
+
+function handleLangCommand(command) {
+  locale.value = command
+}
 
 onMounted(async () => {
   await loadConfig()
@@ -71,7 +93,7 @@ async function loadConfig() {
     const config = await GetConfig()
     appStore.config = config
   } catch (error) {
-    console.error('加载配置失败:', error)
+    console.error(t('config.loadFail'), error)
   }
 }
 
@@ -80,7 +102,7 @@ async function getServiceStatu() {
     const status = await GetServiceStatus()
     appStore.serviceStatus = status
   } catch (error) {
-    console.error('获取服务状态失败:', error)
+    console.error(t('error.getStatus'), error)
   }
 }
 </script>
@@ -100,6 +122,8 @@ async function getServiceStatu() {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+/* ... existing styles ... */
+
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */

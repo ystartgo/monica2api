@@ -41,4 +41,4 @@ config.yaml
 frontend/node_modules/
 frontend/dist/
 .codebuddy/
-.memorious
+.memoriousgo1.23.4.linux-amd64.tar.gz
